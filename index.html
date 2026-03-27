@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic Master Pro - المختبر الهندسي النهائي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&family=Cairo:wght@400;600;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --primary: #38bdf8; --secondary: #10b981; --accent: #f43f5e; --warning: #eab308;
+            --bg-dark: #020617; --card-bg: #0f172a; --text-main: #f8fafc;
+            --border: rgba(56, 189, 248, 0.2);
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; margin: 0; padding: 0; }
+        body { background-color: var(--bg-dark); display: flex; font-family: 'Urbanist', 'Cairo', sans-serif; color: var(--text-main); height: 100vh; overflow: hidden; }
+        body.rtl { direction: rtl; }
+
+        /* Sidebar */
+        .sidebar { width: 340px; background: var(--card-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 25px; z-index: 100; overflow-y: auto; position: relative; }
+        body.rtl .sidebar { border-right: none; border-left: 1px solid var(--border); }
+        .logo { font-weight: 900; font-size: 1.5rem; margin-bottom: 25px; color: var(--primary); text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; }
+
+        /* Global Globe Button */
+        .lang-btn { 
+            position: absolute; top: 20px; right: 20px; background: rgba(56, 189, 248, 0.1); 
+            border: 2px solid var(--primary); border-radius: 50%; width: 45px; height: 45px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; fill: var(--primary);
+            z-index: 1000;
+        }
+        body.rtl .lang-btn { right: auto; left: 20px; }
+        .lang-btn:hover { transform: rotate(360deg); background: var(--primary); fill: white; }
+
+        /* Nav & Grouping */
+        .nav-item { padding: 12px 15px; margin-bottom: 5px; border-radius: 10px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; font-weight: 600; }
+        .nav-item:hover { background: rgba(56, 189, 248, 0.1); color: var(--primary); }
+        .nav-item.active { background: var(--primary); color: var(--bg-dark); font-weight: 800; }
+        .group-label { font-size: 0.75rem; text-transform: uppercase; color: var(--primary); margin: 15px 0 5px 10px; font-weight: 800; letter-spacing: 1px; }
+
+        /* Content Area */
+        .main-container { flex: 1; overflow-y: auto; padding: 60px; position: relative; }
+        .slide { display: none; max-width: 1000px; margin: 0 auto; animation: slideUp 0.4s ease; }
+        .slide.active { display: block; }
+
+        /* Intro Grid */
+        .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+        .card { background: #1e293b; border: 1px solid var(--border); padding: 25px; border-radius: 15px; border-top: 4px solid var(--primary); }
+        .card h3 { color: var(--primary); margin-bottom: 10px; }
+
+        /* Precedence Table */
+        .prec-table { width: 100%; border-collapse: collapse; background: #0f172a; border: 1px solid var(--border); border-radius: 15px; overflow: hidden; margin-top: 20px; }
+        .prec-table th { background: var(--accent); color: white; padding: 15px; }
+        .prec-table td { padding: 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* Technical Visuals */
+        .visual-box { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0; }
+        .img-container { background: white; padding: 20px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; border: 2px solid var(--primary); }
+        .img-container img { max-width: 80%; max-height: 180px; }
+
+        .formula-display { background: #000; padding: 30px; border-radius: 15px; text-align: center; color: var(--secondary); font-size: 2rem; border-bottom: 4px solid var(--secondary); margin-bottom: 30px; }
+
+        /* Truth Table */
+        .truth-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono'; background: #0f172a; margin-top: 20px; }
+        .truth-table th { background: var(--primary); color: black; padding: 15px; }
+        .truth-table td { padding: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .res-cell { color: var(--warning); font-weight: 900; background: rgba(234, 179, 8, 0.1); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="rtl">
+
+    <div class="sidebar">
+        <div class="logo">LOGIC MASTER PRO</div>
+        
+        <button class="lang-btn" onclick="toggleLang()">
+            <svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        </button>
+
+        <div class="nav-item active" onclick="showSlide('intro', this)" data-ar="🏠 المقدمة الشاملة" data-en="🏠 Full Introduction">🏠 المقدمة الشاملة</div>
+        <div class="nav-item" onclick="showSlide('rules', this)" data-ar="⚖️ ترتيب العمليات" data-en="⚖️ Operator Precedence">⚖️ ترتيب العمليات</div>
+        
+        <div class="group-label" data-ar="البوابات الأساسية" data-en="Basic Gates">البوابات الأساسية</div>
+        <div id="basicGatesMenu"></div>
+
+        <div class="group-label" data-ar="البوابات المشتقة" data-en="Derived Gates">البوابات المشتقة</div>
+        <div id="derivedGatesMenu"></div>
+
+        <div class="nav-item" onclick="showSlide('gen', this)" style="margin-top:20px; border:1px solid var(--warning); color:var(--warning);" data-ar="🔬 المحاكي الهندسي" data-en="🔬 Logic Simulator">🔬 المحاكي الهندسي</div>
+    </div>
+
+    <div class="main-container">
+        <div class="slide active" id="slide-intro">
+            <h1 id="txt-intro-h" style="font-size: 3rem; margin-bottom: 10px;"></h1>
+            <p id="txt-intro-p" style="color: #94a3b8; font-size: 1.2rem;"></p>
+            <div class="intro-grid" id="intro-cards"></div>
+        </div>
+
+        <div class="slide" id="slide-rules">
+            <h2 id="txt-rules-h" style="color:var(--accent); font-size: 2.5rem; margin-bottom: 20px;"></h2>
+            <div class="prec-table" id="prec-container"></div>
+        </div>
+
+        <div id="gates-content"></div>
+
+        <div class="slide" id="slide-gen">
+            <h2 style="color:var(--warning); margin-bottom:20px;" data-ar="محاكي الدوائر والمنطق" data-en="Logic & Circuit Simulator">محاكي الدوائر والمنطق</h2>
+            <div style="background:var(--card-bg); padding:30px; border-radius:15px; border:1px solid var(--warning);">
+                <p style="margin-bottom: 10px; color: #94a3b8;" data-ar="استخدم: & (AND), | (OR), ~ (NOT), ^ (XOR)" data-en="Use: & (AND), | (OR), ~ (NOT), ^ (XOR)"></p>
+                <input type="text" id="eqInput" placeholder="e.g. (A & B) | ~C" style="width:100%; padding:15px; background:black; color:var(--warning); border:none; border-radius:10px; font-size:1.5rem; margin-bottom:20px;">
+                <button onclick="runSim()" style="width:100%; padding:15px; background:var(--warning); font-weight:900; border:none; border-radius:10px; cursor:pointer;" data-ar="توليد جدول الصواب" data-en="Generate Truth Table">توليد جدول الصواب</button>
+                <div id="simResult" style="margin-top:30px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'ar';
+        const gates = [
+            { id: 'and', type: 'basic', name: 'AND', ic: '7408', formula: 'A \\cdot B', ar: 'لا تخرج 1 إلا إذا كانت جميع المداخل 1.', en: 'Only outputs 1 if all inputs are 1.', table: [[0,0,0],[0,1,0],[1,0,0],[1,1,1]], sym: 'https://upload.wikimedia.org/wikipedia/commons/6/64/AND_ANSI.svg', pin: 'https://upload.wikimedia.org/wikipedia/commons/c/c5/7408.svg' },
+            { id: 'or', type: 'basic', name: 'OR', ic: '7432', formula: 'A + B', ar: 'تخرج 1 إذا وجد مدخل واحد على الأقل يساوي 1.', en: 'Outputs 1 if at least one input is 1.', table: [[0,0,0],[0,1,1],[1,0,1],[1,1,1]], sym: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/OR_ANSI.svg', pin: 'https://upload.wikimedia.org/wikipedia/commons/0/07/7432.svg' },
+            { id: 'not', type: 'basic', name: 'NOT', ic: '7404', formula: '\\overline{A}', ar: 'بوابة العاكس، تقلب الحالة المنطقية للمدخل.', en: 'Inverter gate, flips the logical state.', table: [[0,1],[1,0]], isSingle: true, sym: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/NOT_ANSI.svg', pin: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/7404.svg' },
+            { id: 'nand', type: 'derived', name: 'NAND', ic: '7400', formula: '\\overline{A \\cdot B}', ar: 'بوابة شاملة، تعطي 0 فقط إذا كانت المداخل 1.', en: 'Universal gate, 0 only if all inputs are 1.', table: [[0,0,1],[0,1,1],[1,0,1],[1,1,0]], sym: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/NAND_ANSI.svg', pin: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/7400.svg' },
+            { id: 'nor', type: 'derived', name: 'NOR', ic: '7402', formula: '\\overline{A + B}', ar: 'بوابة شاملة، تعطي 1 فقط إذا كانت المداخل 0.', en: 'Universal gate, 1 only if all inputs are 0.', table: [[0,0,1],[0,1,0],[1,0,0],[1,1,0]], sym: 'https://upload.wikimedia.org/wikipedia/commons/6/6c/NOR_ANSI.svg', pin: 'https://upload.wikimedia.org/wikipedia/commons/9/90/7402.svg' },
+            { id: 'xor', type: 'derived', name: 'XOR', ic: '7486', formula: 'A \\oplus B', ar: 'تعطي 1 إذا كانت المداخل مختلفة عن بعضها.', en: 'Outputs 1 if inputs are different.', table: [[0,0,0],[0,1,1],[1,0,1],[1,1,0]], sym: 'https://upload.wikimedia.org/wikipedia/commons/0/01/XOR_ANSI.svg', pin: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/7486.svg' },
+            { id: 'xnor', type: 'derived', name: 'XNOR', ic: '74266', formula: '\\overline{A \\oplus B}', ar: 'بوابة التكافؤ، تعطي 1 إذا كانت المداخل متطابقة.', en: 'Equality gate, outputs 1 if inputs match.', table: [[0,0,1],[0,1,0],[1,0,0],[1,1,1]], sym: 'https://upload.wikimedia.org/wikipedia/commons/d/d6/XNOR_ANSI.svg', pin: 'https://upload.wikimedia.org/wikipedia/commons/3/36/74266.svg' }
+        ];
+
+        const dict = {
+            ar: {
+                intro_h: "مختبر الهندسة المنطقية", intro_p: "دليلك الشامل لفهم الإلكترونيات الرقمية وتصميم المعالجات.",
+                rules_h: "ترتيب أولويات العمليات",
+                cards: [
+                    {h: "أساسيات التصميم", p: "بناء الأنظمة المعقدة اعتماداً على المنطق الثنائي (Binary Logic)."},
+                    {h: "النظام الثنائي", p: "لغة الحاسوب الوحيدة التي تتكون من الصفر (إيقاف) والواحد (تشغيل)."},
+                    {h: "البوابات المنطقية", p: "هي العناصر المادية التي تقوم بتنفيذ العمليات الحسابية والمنطقية داخل المعالج."},
+                    {h: "جداول الصواب", p: "خارطة طريق للمهندس تصف سلوك أي دائرة منطقية تحت كل الظروف."}
+                ],
+                prec_h: ["الرتبة", "العملية", "الرمز"],
+                prec_r: [["1", "الأقواس", "( )"], ["2", "النفي (NOT)", "~ / ¬"], ["3", "الضرب (AND)", "& / ·"], ["4", "الجمع (OR / XOR)", "| / + / ^"]]
+            },
+            en: {
+                intro_h: "Logic Engineering Lab", intro_p: "Your complete guide to digital electronics and CPU design.",
+                rules_h: "Operator Precedence",
+                cards: [
+                    {h: "Design Basics", p: "Building complex systems using Binary Logic foundations."},
+                    {h: "Binary System", p: "The computer's language consisting only of 0 (OFF) and 1 (ON)."},
+                    {h: "Logic Gates", p: "Physical components that execute logical operations inside the CPU."},
+                    {h: "Truth Tables", p: "The engineer's roadmap describing circuit behavior under all conditions."}
+                ],
+                prec_h: ["Rank", "Operation", "Notation"],
+                prec_r: [["1", "Parentheses", "( )"], ["2", "NOT", "~ / ¬"], ["3", "AND", "& / ·"], ["4", "OR / XOR", "| / + / ^"]]
+            }
+        };
+
+        function toggleLang() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.body.classList.toggle('rtl', currentLang === 'ar');
+            init();
+        }
+
+        function init() {
+            const d = dict[currentLang];
+            document.getElementById('txt-intro-h').innerText = d.intro_h;
+            document.getElementById('txt-intro-p').innerText = d.intro_p;
+            document.getElementById('txt-rules-h').innerText = d.rules_h;
+            document.getElementById('intro-cards').innerHTML = d.cards.map(c => `<div class="card"><h3>${c.h}</h3><p>${c.p}</p></div>`).join('');
+            document.getElementById('prec-container').innerHTML = `<table class="prec-table"><tr>${d.prec_h.map(h => `<th>${h}</th>`).join('')}</tr>${d.prec_r.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td style="color:var(--primary)">${r[2]}</td></tr>`).join('')}</table>`;
+
+            document.getElementById('basicGatesMenu').innerHTML = gates.filter(g => g.type === 'basic').map(g => `<div class="nav-item" onclick="showSlide('gate-${g.id}', this)">${g.name} Gate</div>`).join('');
+            document.getElementById('derivedGatesMenu').innerHTML = gates.filter(g => g.type === 'derived').map(g => `<div class="nav-item" onclick="showSlide('gate-${g.id}', this)">${g.name} Gate</div>`).join('');
+
+            document.getElementById('gates-content').innerHTML = gates.map(g => `
+                <div class="slide" id="slide-gate-${g.id}">
+                    <h2 style="font-size:3rem; color:var(--primary)">${g.name} <span style="font-size:1rem; background:var(--accent); color:white; padding:5px 15px; border-radius:20px; vertical-align:middle;">IC ${g.ic}</span></h2>
+                    <p style="margin:15px 0; color:#94a3b8;">${currentLang === 'ar' ? g.ar : g.en}</p>
+                    <div class="visual-box">
+                        <div class="img-container"><img src="${g.sym}"><div>Logic Symbol</div></div>
+                        <div class="img-container"><img src="${g.pin}"><div>Pinout Map</div></div>
+                    </div>
+                    <div class="formula-display">$$\\text{Output } F = ${g.formula}$$</div>
+                    <table class="truth-table">
+                        <tr>${(g.isSingle ? ['A', 'F'] : ['A', 'B', 'F']).map(h => `<th>${h}</th>`).join('')}</tr>
+                        ${g.table.map(row => `<tr>${row.map((val, idx) => `<td class="${idx === row.length-1 ? 'res-cell' : ''}">${val}</td>`).join('')}</tr>`).join('')}
+                    </table>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('[data-ar]').forEach(el => el.innerText = el.getAttribute(`data-${currentLang}`));
+            if (window.MathJax) MathJax.typeset();
+        }
+
+        function showSlide(id, btn) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById(`slide-${id}`).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+        }
+
+        function runSim() {
+            let eq = document.getElementById('eqInput').value.toUpperCase();
+            const res = document.getElementById('simResult');
+            const vars = [...new Set(eq.match(/[A-Z]/g))].sort();
+            if(!vars.length) { res.innerHTML = "الرجاء إدخال متغيرات صحيحة (A, B, C...)"; return; }
+
+            // Safe translation of logic operators
+            let jsEq = eq.replace(/&/g, '&&').replace(/\|/g, '||').replace(/~/g, '!').replace(/\^/g, '!==').replace(/\+/g, '||');
+            
+            let h = `<table class="truth-table"><tr>${vars.map(v => `<th>${v}</th>`).join('')}<th>Result</th></tr>`;
+            for (let i = 0; i < Math.pow(2, vars.length); i++) {
+                let bin = i.toString(2).padStart(vars.length, '0');
+                let cur = jsEq;
+                h += '<tr>';
+                vars.forEach((v, idx) => {
+                    h += `<td>${bin[idx]}</td>`;
+                    cur = cur.replace(new RegExp(`\\b${v}\\b`, 'g'), bin[idx]);
+                });
+                try {
+                    let calc = eval(cur) ? 1 : 0;
+                    h += `<td class="res-cell">${calc}</td></tr>`;
+                } catch(e) { res.innerHTML = "خطأ في بناء المعادلة! تأكد من الأقواس."; return; }
+            }
+            res.innerHTML = h + '</table>';
+        }
+
+        init();
+    </script>
+</body>
+</html>
